@@ -2,15 +2,18 @@
 
 A new Flutter project.
 
-## Getting Started
+### To use this project clone this repo
+```
+gh repo clone suyog212/expense_tracker
+```
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### After than open the project in your favorite IDE
+### And run this command to download all packages :
+```
+flutter pub get
+```
+### To run this app on your phone use the command :
+```
+flutter run
+```
+If you have a android device conneccted it will start building the app for that device
