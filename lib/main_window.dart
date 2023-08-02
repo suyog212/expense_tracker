@@ -3,8 +3,8 @@ import 'package:exp_trck/screens/tracs.dart';
 import 'package:exp_trck/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:random_avatar/random_avatar.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class Main_Window extends StatefulWidget {
   const Main_Window({Key? key}) : super(key: key);
@@ -15,7 +15,24 @@ class Main_Window extends StatefulWidget {
 
 class _Main_WindowState extends State<Main_Window> {
   final _userData = Hive.box("UserData");
-  final _expense = Hive.box("Expense");
+  final _expense = Hive.box("History");
+
+  String name = " ";
+  // @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      name = _userData.get("Name");
+    });
+  }
+  // @override
+  // void didChangeDependencies() {
+  //   // TODO: implement didChangeDependencies
+  //   super.didChangeDependencies();
+  //   didUpdateWidget(Main_Window());
+  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +51,8 @@ class _Main_WindowState extends State<Main_Window> {
                 style: TextStyle(color: Colors.grey, fontSize: 18),
               ),
               Text(
-                _userData.get("Name") ?? "",
+                name,
+                // _userData.get("Name") ?? "",
                 style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 20,
@@ -94,35 +112,38 @@ class _Main_WindowState extends State<Main_Window> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ButtonBar(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
-                            shape: BoxShape.circle),
-                        padding: const EdgeInsets.all(5),
-                        child:
-                            const Icon(Icons.arrow_upward, color: Colors.green),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Income",
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            "₹ ${_userData.get("Income") ?? 0}",
-                            style: const TextStyle(
+                  InkWell(
+                    onTap: (){},
+                    child: ButtonBar(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              shape: BoxShape.circle),
+                          padding: const EdgeInsets.all(5),
+                          child:
+                              const Icon(Icons.arrow_upward, color: Colors.green),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Income",
+                              style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600),
-                          )
-                        ],
-                      )
-                    ],
+                              ),
+                            ),
+                            Text(
+                              "₹ ${_userData.get("income") ?? 0}",
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                   ButtonBar(
                     children: [
@@ -144,7 +165,7 @@ class _Main_WindowState extends State<Main_Window> {
                             ),
                           ),
                           Text(
-                            "₹ ${_userData.get("Expense") ?? 0}",
+                            "₹ ${_userData.get("expense") ?? 0}",
                             style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -171,6 +192,7 @@ class _Main_WindowState extends State<Main_Window> {
             ),
             TextButton(
               onPressed: () {
+                print(_expense.values);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const tracs_List()));
               },
@@ -184,18 +206,16 @@ class _Main_WindowState extends State<Main_Window> {
         ),
         ListView.builder(
           shrinkWrap: true,
+          reverse: true,
           itemCount: _expense.length,
+          physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (_, int index) {
             final current = _expense.getAt(index);
-            return ListTile(
-              title: Text(current['time']),
-              subtitle: Text(current['note']),
-              trailing: Column(
-                children: [
-                  Text("${current['balance']}"),
-                  Text(timeago.format(DateTime.parse(current['time'])))
-                ],
-              ),
+            return Transaction(
+              time: DateTime.parse(current['time']),
+              amount: current['balance'],
+              type: current['type'] ?? "Received",
+              category: current['category'],
             );
           },
         ),

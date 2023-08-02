@@ -4,8 +4,6 @@ import 'package:exp_trck/screens/add_expense.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-import 'models.dart';
-
 class Home extends StatefulWidget {
   final String title;
   const Home({Key? key, required this.title}) : super(key: key);

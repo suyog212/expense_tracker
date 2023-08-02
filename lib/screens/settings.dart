@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-
 import '../home.dart';
 
 class Settings extends StatefulWidget {
@@ -69,15 +68,21 @@ class _SettingsState extends State<Settings> {
               title: const Text("Update your balance"),
               subtitle: Text("Current : ${_userData.get("Amount") ?? ""}"),
               onTap: () {
+                // Navigator.push(context, MaterialPageRoute(builder: (_) => UpdateInfo()));
                 showModalBottomSheet(
                     useSafeArea: true,
                     enableDrag: true,
                     isScrollControlled: true,
+                    // showDragHandle: true,
+                    isDismissible: true,
                     backgroundColor: Colors.white,
                     constraints:
-                        const BoxConstraints.tightForFinite(height: 500),
+                        const BoxConstraints.tightForFinite(height: 370),
                     context: context,
                     builder: (_) => Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white
+                      ),
                           padding: const EdgeInsets.all(12.0),
                           child: SingleChildScrollView(
                             scrollDirection: Axis.vertical,
@@ -113,7 +118,7 @@ class _SettingsState extends State<Settings> {
                                     onPressed: () {
                                       setState(() {
                                         _userData.put(
-                                            "Amount", _amount.text.trim());
+                                            "Amount", int.parse(_amount.text));
                                         Navigator.of(context).pop();
                                       });
                                     },
@@ -156,58 +161,64 @@ class _SettingsState extends State<Settings> {
               title: const Text("Edit name"),
               subtitle: Text("Name : ${_userData.get("Name") ?? ""}"),
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => Inputs_page(
+                showModalBottomSheet(
+                    useSafeArea: true,
+                    enableDrag: true,
+                    isScrollControlled: true,
+                    // showDragHandle: true,
+                    isDismissible: true,
+                    backgroundColor: Colors.white,
+                    constraints:
+                    const BoxConstraints.tightForFinite(height: 410),
+                    context: context,
+                    builder: (_) => Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 20),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            TextField(
                               controller: _changeName,
-                              title: "Edit Name",
-                              hint: "Ex. Peter Parker",
-                              label: "Name",
-                              param: 'Name',
-                            )));
-                // showModalBottomSheet(
-                //     context: context,
-                //     builder: (_) {
-                //       return Container(
-                //         padding: const EdgeInsets.all(15.0),
-                //         height: 210,
-                //         child: Column(
-                //           crossAxisAlignment: CrossAxisAlignment.end,
-                //           children: [
-                //             const Row(
-                //               mainAxisAlignment: MainAxisAlignment.start,
-                //               children: [Text("Update Name")],
-                //             ),
-                //             const SizedBox(
-                //               height: 15.0,
-                //             ),
-                //             TextField(
-                //               controller: _changeName,
-                //               decoration: const InputDecoration(
-                //                   border: OutlineInputBorder(),
-                //                   enabledBorder: OutlineInputBorder(),
-                //                   focusedBorder: OutlineInputBorder(),
-                //                   label: Text("Name"),
-                //                   hintText: "Ex. Peter Parker"),
-                //               autofocus: true,
-                //             ),
-                //             const SizedBox(
-                //               height: 15,
-                //             ),
-                //             ElevatedButton(
-                //                 onPressed: () {
-                //                   setState(() {
-                //                     _userData.put(
-                //                         "Name", _changeName.text.trim());
-                //                     Navigator.of(context).pop();
-                //                   });
-                //                 },
-                //                 child: const Text("Update"))
-                //           ],
-                //         ),
-                //       );
-                //     });
+                              decoration: const InputDecoration(
+                                  focusedBorder: OutlineInputBorder(),
+                                  border: OutlineInputBorder(),
+                                  enabledBorder: OutlineInputBorder(),
+                                  hintText: "Name",
+                                  label: ButtonBar(
+                                    alignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(Icons.abc_outlined),
+                                      Text("Name")
+                                    ],
+                                  )),
+                              autofocus: true,
+                              keyboardType: TextInputType.text,
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _userData.put(
+                                        "Name", _changeName.text.trim().toString());
+                                    Navigator.of(context).pop();
+                                  });
+                                },
+                                child: const Text("Update"))
+                          ],
+                        ),
+                      ),
+                    ));
               },
             ),
           ),
@@ -220,7 +231,56 @@ class _SettingsState extends State<Settings> {
               onTap: () {},
               hoverColor: Colors.transparent,
             ),
-          )
+          ),
+          Container(
+            margin: EdgeInsets.all(margin),
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(15.0)),
+            child: ListTile(
+              title: const Text("Clear Transactions"),
+              onTap: () {
+                Hive.box("Income").deleteAll(Hive.box("Income").keys);
+                Hive.box("Expense").deleteAll(Hive.box("Expense").keys);
+                Hive.box("History").deleteAll(Hive.box("History").keys);
+                _userData.put("income", 0);
+                _userData.put("expense", 0);
+                showDialog(context: context, builder: (_){
+                  return Center(
+                    child: Container(
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white
+                      ),
+                      height: 150,
+                      width: MediaQuery.sizeOf(context).width*0.8,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("All transactions are cleared.",style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            // textBaseline: TextBaseline.alphabetic,
+                            decorationColor: Colors.transparent,
+                          ),),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(onPressed: (){
+                                Navigator.pop(context);
+                              }, child: Text("Ok"))
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                });
+                print("Flushed");
+              },
+              hoverColor: Colors.transparent,
+            ),
+          ),
         ],
       ),
     );
@@ -312,11 +372,89 @@ class _Inputs_pageState extends State<Inputs_page> {
                           Navigator.pop(context);
                         });
                       },
-                      child: const Text("Update"))
+                      child: const Text("Update")),
                 ],
               ),
             ),
           ),
         ));
+  }
+}
+
+
+class UpdateInfo extends StatefulWidget {
+  const UpdateInfo({super.key});
+
+  @override
+  State<UpdateInfo> createState() => _UpdateInfoState();
+}
+
+class _UpdateInfoState extends State<UpdateInfo> {
+  final _userData = Hive.box("UserData");
+  TextEditingController _amount = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // backgroundColor: Colors.transparent,
+      body: SizedBox.expand(
+        child: DraggableScrollableSheet(
+          controller: DraggableScrollableController(),
+          initialChildSize: 0.25,
+          maxChildSize: 0.4,
+          minChildSize: 0.2,
+          snap: true,
+          builder: (BuildContext context, ScrollController scrollController) {
+          return SingleChildScrollView(
+            controller: scrollController,
+            child: Container(
+              padding: const EdgeInsets.all(12.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    TextField(
+                      controller: _amount,
+                      decoration: const InputDecoration(
+                          focusedBorder: OutlineInputBorder(),
+                          border: OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(),
+                          hintText: "Amount",
+                          label: ButtonBar(
+                            alignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(Icons.attach_money),
+                              Text("Amount")
+                            ],
+                          )),
+                      autofocus: true,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _userData.put(
+                                "Amount", int.parse(_amount.text));
+                            Navigator.of(context).pop();
+                          });
+                        },
+                        child: const Text("Update"))
+                  ],
+                ),
+              ),
+            ),
+          );
+        },),
+      ),
+    );
   }
 }

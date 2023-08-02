@@ -47,10 +47,10 @@ class _tracs_ListState extends State<tracs_List> {
                 title: Text("${element['category']}"),
                 subtitle: Text("${element['note']}"),
                 trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Text("₹${element['balance']}"),
-                    // Text(timeago.format(DateTime.parse(element['time'])))
-                    Text(DateTime.parse(element['time']).toString())
+                    Text(timeago.format(DateTime.parse(element['time'])))
                   ],
                 ),
                 leading: Icon(element['category'] == "Income" ? Icons.arrow_downward : Icons.arrow_upward),
