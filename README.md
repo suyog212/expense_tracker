@@ -7,7 +7,7 @@ A new Flutter project.
 gh repo clone suyog212/expense_tracker
 ```
 
-### After than open the project in your favorite IDE
+### After that open the project in your favorite IDE
 ### And run this command to download all packages :
 ```
 flutter pub get
